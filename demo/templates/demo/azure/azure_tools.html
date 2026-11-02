@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}azure Tools{% endblock %}
+{% block content %}
+
+<!-- https://icons.getbootstrap.com/ -->
+<!-- https://getbootstrap.com/docs/5.3/utilities/colors/#colors -->
+<!-- https://getbootstrap.com/docs/5.3/components/buttons/#button-tags -->
+<!-- https://getbootstrap.com/docs/5.3/components/modal/ -->
+<!-- Make sure to use bootstrap 5.x syntax for modal attributes they are not the same as they were in bootstrap 4.x-->
+
+
+
+<br>
+<h4 class='text-secondary' color='gray'>Azure Tools</h4>
+
+
+
+<!-- Modal trigger buttons -->
+<br>
+<button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#azure_modal"
+    data-modal-title="Azure Service Names" data-modal-body="{{ azure_service_names }}">Azure Service Names</button>
+<button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#azure_modal"
+    data-modal-title="Azure Region Names" data-modal-body="{{ azure_region_names }}">Azure Region Names</button>
+<br>
+
+
+<br>
+<div class="container mt-4">
+    <form id="azure_lookup_form" method="POST">
+        {% csrf_token %}
+        <fieldset class="mb-4">
+            <legend class="form-label fs-5 fw-bold text-secondary">Lookup Options</legend>
+            <div class="mb-3">
+                <div class="form-check">
+                    <input class="form-check-input search-option" type="radio" name="search_by" id="lookup_by_ipv4" value="1" checked>
+                    <label class="form-check-label" for="lookup_by_ipv4">
+                        Lookup by IPv4:
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input search-option" type="radio" name="search_by" id="lookup_by_service_name" value="2">
+                    <label class="form-check-label" for="lookup_by_service_name">
+                        Lookup by Service Name:
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input search-option" type="radio" name="search_by" id="lookup_by_region_name" value="3">
+                    <label class="form-check-label" for="lookup_by_region_name">
+                        Lookup by Region Name:
+                    </label>
+                </div>
+
+                <!-- IPv4 Search Input -->
+                <div class="mb-3" id="ipv4_input_container">
+                    <label for="ipv4_input" class="form-label">IPv4 Address:</label>
+                    <input type="text" id="ipv4_input" name="ipv4_input" class="form-control"
+                        placeholder="e.g. 192.168.1.1">
+                </div>
+
+                <!-- Service Name Select -->
+                <div class="mb-3" id="service_select_container" style="display: none;">
+                    <label for="service_select" class="form-label">Service Name:</label>
+                    {{ form.azure_service_names }}
+                </div>
+
+                <!-- Region Name Select -->
+                <div class="mb-3" id="region_select_container" style="display: none;">
+                    <label for="region_select" class="form-label">Region Name:</label>
+                    {{ form.azure_region_names }}
+                </div>
+        </fieldset>
+        <button type="submit" class="btn btn-primary">Go</button>
+    </form>
+</div>
+
+
+<!-- Reusable azure modal -->
+<div class="modal fade" id="azure_modal" tabindex="-1" aria-labelledby="azure_modal_label" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="azure_modal_label">azure Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Select an option to see details.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{% static 'js/modalLookupHandler.js' %}"></script>
+<script>
+    // azure-specific lookup configuration
+    const azureLookupConfig = {
+        modalId: 'azure_modal',
+        formId: 'azure_lookup_form',
+        radioSelector: '.search-option',
+        lookups: {
+            '1': {
+                inputId: 'ipv4_input',
+                containerId: 'ipv4_input_container',
+                url: '/azure_tools/fetch_prefixes_by_ipv4_lookup/',
+                paramName: 'ipv4_address',
+                resultLabel: 'IPv4 Lookup Results'
+            },
+            '2': {
+                inputId: 'service_select',
+                containerId: 'service_select_container',
+                url: '/azure_tools/lookup_prefixes_by_service_names/',
+                paramName: 'service_name',
+                resultLabel: 'Service Lookup Results'
+            },
+            '3': {
+                inputId: 'region_select',
+                containerId: 'region_select_container',
+                url: '/azure_tools/lookup_prefixes_by_region_names/',
+                paramName: 'region_name',
+                resultLabel: 'Region Lookup Results'
+            }
+        }
+    };
+
+    // Initialize the modal lookup handler with azure config
+    initializeModalLookup(azureLookupConfig);
+</script>
+
+{% endblock %}

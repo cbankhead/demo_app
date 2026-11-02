@@ -1,0 +1,46 @@
+services:
+  web:
+    build: .
+    expose:
+      - "8000"
+    restart: unless-stopped
+    environment:
+      SECRET_KEY: ${SECRET_KEY:?Export SECRET_KEY before starting Compose}
+      DEBUG: "False"
+      ALLOWED_HOSTS: ${ALLOWED_HOSTS:?Export ALLOWED_HOSTS before starting Compose}
+      CSRF_TRUSTED_ORIGINS: ${CSRF_TRUSTED_ORIGINS:-}
+      DATABASE_URL: sqlite:////data/db.sqlite3
+      DEMO_USER_USERNAME: ${DEMO_USER_USERNAME:-demo}
+      DEMO_USER_PASSWORD: ${DEMO_USER_PASSWORD:?Export DEMO_USER_PASSWORD before starting Compose}
+      DEMO_USER_EMAIL: ${DEMO_USER_EMAIL:-demo@example.com}
+    volumes:
+      - sqlite_data:/data
+      - static_files:/app/staticfiles
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/home/')"
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    restart: unless-stopped
+    depends_on:
+      web:
+        condition: service_healthy
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - /etc/ssl/cloudflare-origin:/etc/nginx/certs:ro
+      - static_files:/usr/share/nginx/html/static:ro
+
+volumes:
+  sqlite_data:
+  static_files:

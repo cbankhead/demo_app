@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}CIDR Calculator{% endblock %}
+{% block content %}
+
+<!-- https://icons.getbootstrap.com/ -->
+<!-- https://getbootstrap.com/docs/5.3/utilities/colors/#colors -->
+<!-- https://getbootstrap.com/docs/5.3/components/buttons/#button-tags -->
+<!-- https://getbootstrap.com/docs/5.3/components/modal/ -->
+<!-- Make sure to use bootstrap 5.x syntax for modal attributes they are not the same as they were in bootstrap 4.x-->
+
+
+
+<br>
+<h4 class='text-secondary' color='gray'>CIDR Calculator</h4>
+
+
+
+<br>
+<div class="container mt-4">
+    <form id="ipv4_cidr_form" method="POST">
+        {% csrf_token %}
+        <fieldset class="mb-4">
+            <legend class="form-label fs-5 fw-bold text-secondary"></legend>
+            <div class="mb-3">
+                <!-- IPv4 Search Input -->
+                <div class="mb-3" id="ipv4_input_container">
+                    <label for="ipv4_input" class="form-label">IPv4 Address:</label>
+                    <input type="text" id="ipv4_input" name="ipv4_input" class="form-control"
+                        placeholder="e.g. 192.168.1.1">
+                </div>
+                <div class="mb-3" id="cidr_input_container">
+                    <label for="cidr_input" class="form-label">CIDR Prefix:</label>
+                    <input type="text" id="cidr_input" name="cidr_input" class="form-control"
+                        placeholder="e.g. 24">
+                </div>
+            </div>
+
+        </fieldset>
+        <button id="cidr_submit_button" type="submit" class="btn btn-primary">Go</button>
+    </form>
+</div>
+
+
+<!-- Reusable CIDR modal -->
+<div class="modal fade" id="cidr_modal" tabindex="-1" aria-labelledby="cidr_modal_label" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="cidr_modal_label">CIDR Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <pre id="cidr_modal_output" class="mb-0"></pre>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="{% static 'js/cidrCalculator.js' %}" defer></script>
+{% endblock %}

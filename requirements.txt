@@ -1,0 +1,7 @@
+Django==6.1
+#django-bootstrap5==26.2 Only if CDN is not an option for you
+requests==2.34.2
+gunicorn==23.0.0
+whitenoise==6.8.2
+dj-database-url==2.3.0
+#psycopg2-binary==2.9.10 Only if you are using PostgreSQL as your database
